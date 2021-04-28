@@ -183,12 +183,48 @@ $y_{n+1}=y_n-\frac{f(y_n)}{\frac{df}{dy}|_{y=y_n}}$
 > 然后这个在 A 点上近似 $f$ 的切线的根（即零点）会比 A 点更接近 $f$ 的根
 > 所以这个更近的点是 $y_{n+1}=y_n-\frac{f(y_n)}{f'(y_n)}$
 
+* wishfull thinking, topdown programing
+
+假设 Newton Method 已经被实现，那么用 NM 求平方根就要输入 $f$ 和 guess value $y_n$，代码如下所示：
 ```Lisp
 (DEFINE (SQRT X)
     (NEWTON (λ(Y)(- X (SQUARE Y)))
             1))
 ```
 > SQRT X means The square root of X   
+
+然后需要一个过程（procedure）来计算出函数（function）的导数，这个函数由给出的过程 f 来计算。所以函数和过程是两个概念。
+
+```Lisp
+(DEFINE (NEWTON f guess)
+    (DEFINE DF (DERIVE f))
+    (FIXED-POINT
+        (λ(X)(- X (/ (f X)(DF X))))
+        guess))
+```
+
+然后再实现这个求导的过程 DRIVE ，其以一个 procedure 为参数，然后返回一个 procedure。
+求导：$df=\frac{f(x+dx)-f(x)}{dx}$
+```Lisp
+(DEFINE DERIVE
+    (λ(f)
+        (λ(X)
+            (/ (- (f (+ X dX)) 
+                  (f X)) 
+               dX))))
+
+(DEFINE dX 0.00001)
+```
+
+
 > DF means the derivative of f
 
 > procedures compute functions
+
+> The rights and privileges of first-class citizens -- by Chris Strachey
+> 
+> * To be named by variables.
+> * To be passed as arguments to procedures.
+> * To be returned as values of procedures.
+> * To be incorporated into data structures.
+   
